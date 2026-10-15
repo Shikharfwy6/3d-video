@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rajneeshpuram – Paper Model Intro (v4 · 17 cuts · Full HD)</title>
+<title>Rajneeshpuram – Cardboard Model Intro (v6 · no bricks · Full HD)</title>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 :root{--red:#c4122c;--paper:#e6e1d6}
@@ -76,7 +76,7 @@ canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
   <div id="start"><div>
     <button class="btn" id="go">▶ PLAY (PREVIEW)</button>
     <button class="btn alt" id="hd">⬇ FULL HD RENDER · MP4</button>
-    <p style="color:#c4122c;opacity:.9">v4 · 17 cuts (reference ke jitne) · 60 sec · 16:9</p>
+    <p style="color:#c4122c;opacity:.9">v6 · bricks hata diye · cardboard · 17 cuts · 60 sec · 16:9</p>
     <p>Sound on rakhna – tap karo</p>
   </div></div>
 
@@ -195,7 +195,7 @@ function resize(){
 addEventListener('resize',()=>{if(!exporting)resize()});resize();
 
 /* ---------- lights ---------- */
-scene.add(new THREE.HemisphereLight(0x8d8d94,0x050505,.1));
+scene.add(new THREE.HemisphereLight(0x9a9a9e,0x070605,.15));
 const rim=new THREE.DirectionalLight(0x9fb0d0,.22);rim.position.set(-10,7,-14);scene.add(rim);
 const spot=new THREE.SpotLight(0xffffff,1.7,0,.62,.85,1);
 spot.castShadow=true;const SM=mobile?1024:2048;spot.shadow.mapSize.set(SM,SM);spot.shadow.bias=-.0005;
@@ -203,13 +203,15 @@ spot.shadow.camera.near=1;spot.shadow.camera.far=70;
 scene.add(spot);scene.add(spot.target);
 const camLight=new THREE.PointLight(0xffffff,0,16,1.6);scene.add(camLight);
 
+let seed=1234567;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
 /* ---------- helpers ---------- */
 function mergeGeos(geos){
   let vc=0,ic=0;geos.forEach(g=>{vc+=g.attributes.position.count;ic+=g.index.count});
-  const pos=new Float32Array(vc*3),nor=new Float32Array(vc*3),uv=new Float32Array(vc*2),idx=new Uint32Array(ic);
+  const pos=new Float32Array(vc*3),nor=new Float32Array(vc*3),uv=new Float32Array(vc*2),ed=new Float32Array(vc*4),idx=new Uint32Array(ic);
   let vo=0,io=0;
   geos.forEach(g=>{
     pos.set(g.attributes.position.array,vo*3);nor.set(g.attributes.normal.array,vo*3);uv.set(g.attributes.uv.array,vo*2);
+    if(g.attributes.aEdge)ed.set(g.attributes.aEdge.array,vo*4);
     const gi=g.index.array;for(let i=0;i<gi.length;i++)idx[io+i]=gi[i]+vo;
     vo+=g.attributes.position.count;io+=gi.length;
   });
@@ -217,12 +219,18 @@ function mergeGeos(geos){
   m.setAttribute('position',new THREE.BufferAttribute(pos,3));
   m.setAttribute('normal',new THREE.BufferAttribute(nor,3));
   m.setAttribute('uv',new THREE.BufferAttribute(uv,2));
+  m.setAttribute('aEdge',new THREE.BufferAttribute(ed,4));
   m.setIndex(new THREE.BufferAttribute(idx,1));
   return m;
 }
 function fitUV(geo,w,h,d,s){
-  const uv=geo.attributes.uv,dims=[[d,h],[d,h],[w,d],[w,d],[w,h],[w,h]];
-  for(let f=0;f<6;f++)for(let i=0;i<4;i++){const k=f*4+i;uv.setXY(k,uv.getX(k)*dims[f][0]/s,uv.getY(k)*dims[f][1]/s)}
+  const uv=geo.attributes.uv,dims=[[d,h],[d,h],[w,d],[w,d],[w,h],[w,h]],ae=new Float32Array(24*4);
+  for(let f=0;f<6;f++)for(let i=0;i<4;i++){
+    const k=f*4+i,u0=uv.getX(k),v0=uv.getY(k);
+    ae[k*4]=u0*dims[f][0];ae[k*4+1]=v0*dims[f][1];ae[k*4+2]=dims[f][0];ae[k*4+3]=dims[f][1];   // position on the face, in world units + face size
+    uv.setXY(k,u0*dims[f][0]/s,v0*dims[f][1]/s);
+  }
+  geo.setAttribute('aEdge',new THREE.BufferAttribute(ae,4));
   uv.needsUpdate=true;
 }
 function Builder(){this.m=new Map()}
@@ -234,6 +242,11 @@ Builder.prototype.add=function(key,mat,geo,x,y,z,cast=true){
 Builder.prototype.box=function(key,mat,w,h,d,x,yBase,z){
   const g=new THREE.BoxGeometry(w,h,d);fitUV(g,w,h,d,2.4);this.add(key,mat,g,x,yBase+h/2,z);
 };
+// a thick block built from stacked card sheets (slightly mis-registered, like hand-cut card)
+function layered(B,key,mat,w,h,d,x,yBase,z,lh=.06,jit=.012){
+  const n=Math.max(1,Math.round(h/lh)),hh=h/n;
+  for(let i=0;i<n;i++)B.box(key,mat,w+(rnd()-.5)*jit*2,hh*.996,d+(rnd()-.5)*jit*2,x+(rnd()-.5)*jit*2,yBase+i*hh,z+(rnd()-.5)*jit*2);
+}
 Builder.prototype.cyl=function(key,mat,rt,rb,h,seg,x,yBase,z){
   this.add(key,mat,new THREE.CylinderGeometry(rt,rb,h,seg),x,yBase+h/2,z);
 };
@@ -247,22 +260,25 @@ const HMAP=new Map();
 function makeTex(kind,size=512){
   const c=document.createElement('canvas');c.width=c.height=size;const g=c.getContext('2d');
   const hc=document.createElement('canvas');hc.width=hc.height=size;const hg=hc.getContext('2d');
-  const base={stone:'#ebeae6',roof:'#9c9b96',plain:'#f1f0ec',card:'#c4c3be',checker:'#efeeea'}[kind];
+  const base={stone:'#e8e4da',roof:'#938f85',plain:'#eeeadf',card:'#cbc2ad',checker:'#ebe7dc'}[kind];
   g.fillStyle=base;g.fillRect(0,0,size,size);
   hg.fillStyle='#808080';hg.fillRect(0,0,size,size);
   const id=g.getImageData(0,0,size,size),d=id.data;
   for(let i=0;i<d.length;i+=4){const n=(Math.random()-.5)*7;d[i]+=n;d[i+1]+=n;d[i+2]+=n}
   g.putImageData(id,0,0);
-  const groove=(x,y,w,h)=>{g.fillStyle='rgba(0,0,0,.26)';g.fillRect(x,y,w,h);hg.fillStyle='#383838';hg.fillRect(x,y,w,h)};
-  if(kind==='stone'){
-    const rows=8,rh=size/rows;
-    for(let r=0;r<rows;r++){
-      groove(0,r*rh,size,4);g.fillStyle='rgba(255,255,255,.35)';g.fillRect(0,r*rh+4,size,1.5);
-      const off=r%2?size/8:0;
-      for(let k=0;k<4;k++){const x=(k*size/4+off)%size;groove(x,r*rh,4,rh);
-        g.fillStyle='rgba(0,0,0,'+(Math.random()*.05)+')';g.fillRect(x+5,r*rh+6,size/4-10,rh-10)}
-    }
+  for(let i=0;i<46;i++){ // soft mottling (uneven card tone)
+    const x=Math.random()*size,y=Math.random()*size,r=50+Math.random()*120,dark=Math.random()<.55;
+    const gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,dark?'rgba(70,58,40,.07)':'rgba(255,252,240,.10)');gr.addColorStop(1,'rgba(0,0,0,0)');
+    g.fillStyle=gr;g.fillRect(x-r,y-r,r*2,r*2);
   }
+  for(let i=0;i<420;i++){ // paper fibres: visible in colour, only a whisper in the (blurred) relief
+    const x=Math.random()*size,y=Math.random()*size,a=Math.random()*6.28,l=10+Math.random()*34,lt=Math.random()<.5;
+    g.strokeStyle=lt?'rgba(255,255,250,.22)':'rgba(70,58,40,.10)';g.lineWidth=.6+Math.random()*.9;
+    g.beginPath();g.moveTo(x,y);g.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l);g.stroke();
+    hg.strokeStyle=lt?'rgba(255,255,255,.10)':'rgba(0,0,0,.10)';hg.lineWidth=1.2;
+    hg.beginPath();hg.moveTo(x,y);hg.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l);hg.stroke();
+  }
+  const groove=(x,y,w,h)=>{g.fillStyle='rgba(0,0,0,.26)';g.fillRect(x,y,w,h);hg.fillStyle='#383838';hg.fillRect(x,y,w,h)};
   if(kind==='roof'){for(let x=0;x<size;x+=size/16){groove(x,0,4,size);g.fillStyle='rgba(255,255,255,.16)';g.fillRect(x+4,0,2,size)}}
   if(kind==='checker'){
     const n=4,s=size/n;
@@ -276,18 +292,39 @@ function makeTex(kind,size=512){
   const tmp=document.createElement('canvas');tmp.width=tmp.height=size/2;
   tmp.getContext('2d').drawImage(hc,0,0,size/2,size/2);
   hg.imageSmoothingEnabled=true;hg.drawImage(tmp,0,0,size,size);
+  tmp.getContext('2d').clearRect(0,0,size/2,size/2);tmp.getContext('2d').drawImage(hc,0,0,size/2,size/2);hg.drawImage(tmp,0,0,size,size);   // 2nd soften pass: no shimmer
   const ht=new THREE.CanvasTexture(hc);ht.wrapS=ht.wrapT=THREE.RepeatWrapping;
   const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=mobile?2:8;t.encoding=THREE.sRGBEncoding;
   HMAP.set(t,ht);return t;
 }
+function cardify(m){
+  m.onBeforeCompile=sh=>{
+    sh.vertexShader=sh.vertexShader
+      .replace('#include <common>','#include <common>\nattribute vec4 aEdge;\nvarying vec4 vEdge;')
+      .replace('#include <begin_vertex>','#include <begin_vertex>\nvEdge=aEdge;');
+    sh.fragmentShader=sh.fragmentShader
+      .replace('#include <common>','#include <common>\nvarying vec4 vEdge;')
+      .replace('#include <map_fragment>',`#include <map_fragment>
+        if(vEdge.z>0.01){
+          float e=min(min(vEdge.x,vEdge.z-vEdge.x),min(vEdge.y,vEdge.w-vEdge.y));
+          float strip=1.0-smoothstep(0.026,0.040,e);
+          float ln=smoothstep(.35,.5,abs(fract(e*320.)-.5));
+          vec3 core=diffuseColor.rgb*vec3(1.0,.88,.70)*(1.0-.16*ln);
+          core*=mix(.45,1.0,smoothstep(0.0,.007,e));
+          diffuseColor.rgb=mix(diffuseColor.rgb,core,strip*.9);
+        }`);
+  };
+  m.customProgramCacheKey=()=>'cardify';
+  return m;
+}
 function pmat(tex,bs){
   const o={map:tex,roughness:1,metalness:0};
   if(bs>0){o.bumpMap=HMAP.get(tex);o.bumpScale=bs}
-  return new THREE.MeshStandardMaterial(o);
+  return cardify(new THREE.MeshStandardMaterial(o));
 }
 const stoneTex=makeTex('stone'),plainTex=makeTex('plain'),roofTex=makeTex('roof'),cardTex=makeTex('card'),checkTex=makeTex('checker');
-const paper=pmat(stoneTex,2.4),paperL=pmat(plainTex,0),paperT=pmat(plainTex,0),paperD=pmat(cardTex,0),roofM=pmat(roofTex,3),checkM=pmat(checkTex,2.5);
-const darkM=new THREE.MeshStandardMaterial({color:0x34332f,roughness:1});
+const paper=pmat(stoneTex,.7),paperL=pmat(plainTex,.8),paperT=pmat(plainTex,.6),paperD=pmat(cardTex,.9),roofM=pmat(roofTex,3),checkM=pmat(checkTex,2.5);
+const darkM=cardify(new THREE.MeshStandardMaterial({color:0x34332f,roughness:1}));
 const blackM=new THREE.MeshBasicMaterial({color:0x000000});
 
 function inkTex(w,h,draw){
@@ -391,10 +428,11 @@ function shaft(parent,x,y,z,w,h,rz,ry){const m=new THREE.Mesh(new THREE.PlaneGeo
 /* ---------- glowing glass (shared; flickers gently) ---------- */
 const glassM=[0,1,2].map(()=>new THREE.MeshStandardMaterial({color:0x101010,emissive:0xdcebff,emissiveIntensity:0}));
 function win(B,x,y,z,w,h,d){
-  const side=w<d,U=side?d:w,T=side?w:d,ft=.05,th=T+.08,gi=(Math.random()*3)|0;
+  const side=w<d,U=side?d:w,T=side?w:d,ft=.05,th=T+.11,gi=(Math.random()*3)|0;
   B.add('glass'+gi,glassM[gi],new THREE.BoxGeometry(w,h,d),x,y,z,false);
   const bar=(u,v,t,pu,pv)=>{
     const gg=side?new THREE.BoxGeometry(t,v,u):new THREE.BoxGeometry(u,v,t);
+    if(side)fitUV(gg,t,v,u,2.4);else fitUV(gg,u,v,t,2.4);
     B.add('frame',paperL,gg,side?x:x+pu,y+pv,side?z+pu:z);
   };
   bar(U+.1,ft,th,0,h/2);bar(U+.1,ft,th,0,-h/2);bar(ft,h,th,U/2,0);bar(ft,h,th,-U/2,0);
@@ -423,15 +461,15 @@ const blobMat=new THREE.MeshBasicMaterial({map:(function(){const c=document.crea
 /* ================= EXTERIOR BUILDING ================= */
 const root=new THREE.Group();scene.add(root);
 const EB=new Builder();
-EB.box('plinth',paperL,15,.3,16,0,0,-3.2);
+layered(EB,'plinth',paperL,15,.3,16,0,0,-3.2,.06,.016);
 const g2=new THREE.Group();g2.position.y=.3;root.add(g2);
 const XB=new Builder();                       // g2 space (y measured above the plinth)
 const bx=(key,mat,w,h,d,x,y,z)=>XB.box(key,mat,w,h,d,x,y,z);
 bx('wall',paper,4.2,3.2,3.0,0,0,0);
 bx('wall',paper,3.6,2.2,10.0,-3.9,0,-3.7);bx('wall',paper,3.6,2.2,10.0,3.9,0,-3.7);
 bx('dwall',darkM,4.2,3.8,1.0,0,0,-8.2);                        // taller, dark rear block (courtyard facade)
-bx('roof',roofM,3.8,.15,10.2,-3.9,2.2,-3.7);bx('roof',roofM,3.8,.15,10.2,3.9,2.2,-3.7);
-bx('roof',roofM,4.4,.15,3.2,0,3.2,0);bx('roof',roofM,4.4,.15,1.2,0,3.8,-8.2);
+layered(XB,'roof',roofM,3.8,.15,10.2,-3.9,2.2,-3.7,.05,.01);layered(XB,'roof',roofM,3.8,.15,10.2,3.9,2.2,-3.7,.05,.01);
+layered(XB,'roof',roofM,4.4,.15,3.2,0,3.2,0,.05,.01);layered(XB,'roof',roofM,4.4,.15,1.2,0,3.8,-8.2,.05,.01);
 [-1,1].forEach(sd=>{
   const cx=3.9*sd;
   bx('trim',paperL,4.0,.17,10.4,cx,2.05,-3.7);
@@ -483,7 +521,6 @@ evidence(g2,0,0,-1.5,Math.PI,
 EB.flush(root);XB.flush(g2);
 
 /* ---------- paper trees (merged = 1 mesh each) ---------- */
-let seed=1234567;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
 function branch(parent,len,rad,depth){
   const p=new THREE.Group();parent.add(p);
   const m=new THREE.Mesh(new THREE.CylinderGeometry(rad*.6,rad,len,5),paperT);m.position.y=len/2;p.add(m);
@@ -508,7 +545,7 @@ let posterMat;
 (function(){
   const G=new THREE.Group();G.position.set(80,0,0);scene.add(G);
   const B=new Builder();
-  B.box('floor',checkM,13.4,.3,23,0,0,-4);
+  layered(B,'floor',checkM,13.4,.3,23,0,0,-4,.1,.012);
   B.box('wall',paper,.5,9.2,23,-6.45,.3,-4);B.box('wall',paper,.5,9.2,23,6.45,.3,-4);
   B.box('wall',paper,13.4,9.2,.5,0,.3,-15.15);
   const N=14,rise=.37,run=.575,z0=-4.5;
@@ -545,7 +582,7 @@ let posterMat;
 (function(){
   const G=new THREE.Group();G.position.set(0,0,-90);scene.add(G);
   const B=new Builder();
-  B.box('floor',checkM,3.6,.3,18.4,0,0,0);
+  layered(B,'floor',checkM,3.6,.3,18.4,0,0,0,.1,.012);
   B.box('wall',paper,.4,4.6,18.4,-2.0,.3,0);B.box('wall',paper,.4,4.6,18.4,2.0,.3,0);
   B.box('wall',paper,4.4,4.6,.4,0,.3,-9.2);
   [-6,-3,0,3].forEach(z=>[-1,1].forEach(sx=>{
@@ -572,7 +609,7 @@ let gearMat;
 (function(){
   const G=new THREE.Group();G.position.set(160,0,0);scene.add(G);
   const B=new Builder();
-  B.box('floor',checkM,5,.3,14,0,0,-2);
+  layered(B,'floor',checkM,5,.3,14,0,0,-2,.1,.012);
   const N=14,rise=.36,run=.55,z0=1.0;
   for(let i=0;i<N;i++)B.box('step',paperL,3.2,(i+1)*rise,run,0,.3,z0-(i+.5)*run);
   B.box('step',paperL,3.2,N*rise,2.1,0,.3,z0-N*run-1.05);
@@ -814,6 +851,7 @@ function drawTitle(ctx,t,W,H){
 // glWidth/H: the WebGL canvas is already EW×EH during export
 function compose(t,W,H){
   cctx.globalAlpha=1;cctx.globalCompositeOperation='source-over';cctx.shadowBlur=0;
+  cctx.fillStyle='#000';cctx.fillRect(0,0,W,H);          // every frame starts clean
   cctx.drawImage(canvas,0,0,W,H);
   const d=dofAt(t),bpx=d.blur*W/1280;
   if(DOF_OK&&bpx>.4){                               // depth-of-field look: blurred copy, masked to the edges
