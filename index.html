@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rajneeshpuram – Cardboard Model Intro (v6 · no bricks · Full HD)</title>
+<title>Rajneeshpuram – Cardboard Model Intro (v8 · English · Full HD)</title>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 :root{--red:#c4122c;--paper:#e6e1d6}
@@ -27,7 +27,7 @@ canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
 #screen.lite .dof,#screen.lite .grain{display:none}   /* phones: no live blur => smooth preview (export is always full quality) */
 #dip{position:absolute;inset:0;background:#000;z-index:6;pointer-events:none;opacity:1}
 
-.lab{position:absolute;z-index:7;opacity:0;transition:opacity .5s;pointer-events:none;text-shadow:0 0 14px rgba(0,0,0,.9)}
+.lab{position:absolute;z-index:7;opacity:0;transition:opacity .5s;pointer-events:none;text-shadow:0 0 14px rgba(0,0,0,.95),0 0 3px rgba(0,0,0,.9)}
 .lab.show{opacity:1}
 .lab.r{text-align:right}
 .lab.c{transform:translateX(-50%);text-align:center}
@@ -50,9 +50,11 @@ canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
   opacity:0;transform:translateY(10px);text-shadow:0 0 30px rgba(0,0,0,.8)}
 #title small{font-size:.5em;vertical-align:.18em;letter-spacing:.05em}
 #sub2{margin-top:14px;font:700 max(10px,calc(var(--vw)*.9)) 'Big Shoulders Display',sans-serif;letter-spacing:.42em;color:var(--paper);opacity:0}
+#sub3{margin-top:12px;font:700 max(10px,calc(var(--vw)*.8)) 'Big Shoulders Display',sans-serif;letter-spacing:.32em;color:#a79f8d;opacity:0}
 #note{position:absolute;left:0;right:0;bottom:5%;z-index:8;text-align:center;padding:0 18px;font-size:max(10px,calc(var(--vw)*.7));line-height:1.5;color:#a79f8d;opacity:0;pointer-events:none}
 .go #title{animation:tIn 1.2s ease-out forwards}
 .go #sub2{animation:fade 1.2s .9s forwards}
+.go #sub3{animation:fade 1.2s 1.5s forwards}
 .go #note{animation:fade 1.2s 2.4s forwards}
 @keyframes tIn{to{opacity:1;transform:none}}
 @keyframes fade{to{opacity:1}}
@@ -76,8 +78,8 @@ canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
   <div id="start"><div>
     <button class="btn" id="go">▶ PLAY (PREVIEW)</button>
     <button class="btn alt" id="hd">⬇ FULL HD RENDER · MP4</button>
-    <p style="color:#c4122c;opacity:.9">v6 · bricks hata diye · cardboard · 17 cuts · 60 sec · 16:9</p>
-    <p>Sound on rakhna – tap karo</p>
+    <p style="color:#c4122c;opacity:.9">v8 · English text · 17 cuts · 60 sec · 16:9</p>
+    <p>Turn your sound on – tap to start</p>
   </div></div>
 
   <canvas id="gl"></canvas>
@@ -85,11 +87,12 @@ canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
   <div id="labels"></div>
   <div id="titleBox">
     <div id="title">Rajneesh<small>·</small>puram</div>
-    <div id="sub2">EK SHEHAR · EK BHAGWAN · EK SAAZISH</div>
+    <div id="sub2">ONE CITY · ONE GURU · ONE CONSPIRACY</div>
+    <div id="sub3">SHIKHAR YADAV · @SHIKHARYADAVDOCS</div>
   </div>
-  <div id="note">Sabhi aarop court records aur reports par based hain. Zyaadatar aarop Sheela aur uske inner circle par the; Osho ne immigration fraud par plea di.</div>
+  <div id="note">All allegations are based on court records and news reports. Most allegations were against Sheela and her inner circle; Osho entered a plea on immigration fraud.</div>
   <div id="dip"></div>
-  <div id="replayBox"><button id="replay">&#8635; Dobara chalao</button><button id="replayHD">⬇ Full HD render</button></div>
+  <div id="replayBox"><button id="replay">&#8635; Replay</button><button id="replayHD">⬇ Full HD render</button></div>
   <div id="exportUI"><div>
     <div id="exTxt"></div><div id="exBar"><i></i></div>
     <button class="btn alt" id="exCancel" style="font-size:16px;padding:8px 22px">CANCEL</button>
@@ -100,29 +103,29 @@ canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
 <script>
 (function(){
 const TITLE_T=55.0;
-const LI=.72;                                   // overall light level (raise if too dark, lower if too bright)
+const LI=.64;                                   // overall light level (raise if too dark, lower if too bright)
 const mobile=/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
 const HQ=/[?&]hq=1/.test(location.search);
 
 /* ====== EDIT HERE: credits / allegations ======  side: l / r / c(entre) ; x,y in % of the frame */
 const LABELS=[
- {t:3.3, d:1.5,side:'l',x:'9%', y:'40%',tag:'EK INVESTIGATION',main:'OREGON, USA · 1981',sub:''},
- {t:6.2, d:2.9,side:'l',x:'14%',y:'44%',tag:'SHEHAR',main:'BIG MUDDY RANCH',sub:'1981 mein kharida gaya ranch; baad mein yahan shehar bana.'},
- {t:11.2,d:3.0,side:'r',x:'9%', y:'56%',tag:'AAROP · IMMIGRATION',main:'FAKE SHAADIYAN',sub:'Followers ko America mein rakhne ke liye sham marriages.'},
- {t:15.4,d:3.4,side:'c',x:'50%',y:'74%',tag:'AAROP · 1984',main:'751 LOG BEEMAR',sub:'The Dalles ke salad bars mein salmonella. Aarop: Sheela ke saathi.'},
- {t:19.8,d:1.8,side:'l',x:'20%',y:'38%',tag:'AAROP · JASOOSI',main:'WIRETAPPING',sub:''},
- {t:22.6,d:3.4,side:'l',x:'14%',y:'76%',tag:'AAROP · SAAZISH',main:'CHARLES TURNER',sub:'US Attorney ko maarne ka plan.'},
- {t:22.6,d:3.4,side:'r',x:'14%',y:'76%',tag:'AAROP · HAMLA',main:'ZEHAR AUR AAG',sub:'Doctor par; Wasco County office mein aag.'},
- {t:26.7,d:2.2,side:'c',x:'50%',y:'58%',tag:'TIMELINE · 1982',main:'CITY INCORPORATED',sub:'Rajneeshpuram shehar ke roop mein darj hua.'},
- {t:29.6,d:1.7,side:'r',x:'16%',y:'14%',tag:'SCRIPT AUR EDIT',main:'APKA NAAM',sub:''},
+ {t:3.3, d:1.5,side:'l',x:'9%', y:'40%',tag:'AN INVESTIGATION',main:'OREGON, USA · 1981',sub:''},
+ {t:6.2, d:2.9,side:'l',x:'14%',y:'44%',tag:'THE CITY',main:'BIG MUDDY RANCH',sub:'Bought in 1981. The city was built here later.'},
+ {t:11.2,d:3.0,side:'r',x:'9%', y:'56%',tag:'ALLEGATION · IMMIGRATION',main:'SHAM MARRIAGES',sub:'Sham marriages to keep followers in America.'},
+ {t:15.4,d:3.4,side:'c',x:'50%',y:'74%',tag:'ALLEGATION · 1984',main:'751 PEOPLE SICKENED',sub:'Salmonella in The Dalles salad bars. Alleged: Sheela\'s associates.'},
+ {t:19.8,d:1.8,side:'l',x:'20%',y:'38%',tag:'ALLEGATION · SURVEILLANCE',main:'WIRETAPPING',sub:''},
+ {t:22.6,d:3.4,side:'l',x:'14%',y:'76%',tag:'ALLEGATION · PLOT',main:'CHARLES TURNER',sub:'A plot to kill the US Attorney.'},
+ {t:22.6,d:3.4,side:'r',x:'14%',y:'76%',tag:'ALLEGATION · ATTACKS',main:'POISON AND ARSON',sub:'A doctor targeted; arson at a Wasco County office.'},
+ {t:26.7,d:2.2,side:'c',x:'50%',y:'58%',tag:'TIMELINE · 1982',main:'CITY INCORPORATED',sub:'Rajneeshpuram became a legal city.'},
+ {t:29.6,d:1.7,side:'r',x:'16%',y:'14%',tag:'SCRIPT & EDIT',main:'SHIKHAR YADAV',sub:''},
  {t:34.6,d:3.1,side:'c',x:'50%',y:'21%',tag:'RESEARCH',main:'COURT RECORDS',sub:''},
- {t:34.6,d:3.1,side:'l',x:'18%',y:'84%',tag:'VOICE',main:'APKA NAAM',sub:''},
+ {t:34.6,d:3.1,side:'l',x:'18%',y:'84%',tag:'VOICE',main:'SHIKHAR YADAV',sub:''},
  {t:34.6,d:3.1,side:'r',x:'18%',y:'84%',tag:'MUSIC',main:'ORIGINAL SCORE',sub:''},
- {t:38.5,d:1.9,side:'c',x:'50%',y:'58%',tag:'EK PRESENTATION',main:'APKA CHANNEL',sub:''},
+ {t:38.5,d:1.9,side:'c',x:'50%',y:'58%',tag:'A PRESENTATION BY',main:'@SHIKHARYADAVDOCS',sub:''},
  {t:41.0,d:1.8,side:'r',x:'14%',y:'16%',tag:'SOURCES',main:'NEWS REPORTS',sub:''},
- {t:43.4,d:1.8,side:'l',x:'9%', y:'30%',tag:'ARCHIVE',main:'ADALAT KE RECORD',sub:''},
- {t:46.0,d:2.2,side:'l',x:'10%',y:'66%',tag:'RESEARCH · SCRIPT · EDIT',main:'APKA NAAM',sub:''},
- {t:48.9,d:2.7,side:'r',x:'8%', y:'36%',big:true,tag:'OSHO PAR',main:'IMMIGRATION FRAUD',sub:'Plea. $400,000 jurmana. 1985 mein deport.'}
+ {t:43.4,d:1.8,side:'l',x:'9%', y:'30%',tag:'ARCHIVE',main:'COURT ARCHIVES',sub:''},
+ {t:46.0,d:2.2,side:'l',x:'10%',y:'66%',tag:'RESEARCH · SCRIPT · EDIT',main:'SHIKHAR YADAV',sub:''},
+ {t:48.9,d:2.7,side:'r',x:'8%', y:'36%',big:true,tag:'ON OSHO',main:'IMMIGRATION FRAUD',sub:'Plea entered. $400,000 fine. Deported in 1985.'}
 ];
 
 /* ====== 17 SHOTS = same cut times & camera angles as the reference intro ======
@@ -179,7 +182,7 @@ renderer.setPixelRatio(PR);
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.shadowMap.autoUpdate=false;            // static inside a shot -> shadows re-baked once per shot
 renderer.shadowMap.needsUpdate=true;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.9;renderer.outputEncoding=THREE.sRGBEncoding;
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x030303);
 scene.fog=new THREE.Fog(0x030303,16,46);
@@ -260,23 +263,16 @@ const HMAP=new Map();
 function makeTex(kind,size=512){
   const c=document.createElement('canvas');c.width=c.height=size;const g=c.getContext('2d');
   const hc=document.createElement('canvas');hc.width=hc.height=size;const hg=hc.getContext('2d');
-  const base={stone:'#e8e4da',roof:'#938f85',plain:'#eeeadf',card:'#cbc2ad',checker:'#ebe7dc'}[kind];
+  const base={stone:'#d9d5c9',roof:'#8a867c',plain:'#dfdbce',card:'#c4bba6',checker:'#dcd8cc'}[kind];
   g.fillStyle=base;g.fillRect(0,0,size,size);
   hg.fillStyle='#808080';hg.fillRect(0,0,size,size);
   const id=g.getImageData(0,0,size,size),d=id.data;
-  for(let i=0;i<d.length;i+=4){const n=(Math.random()-.5)*7;d[i]+=n;d[i+1]+=n;d[i+2]+=n}
+  for(let i=0;i<d.length;i+=4){const n=(Math.random()-.5)*3;d[i]+=n;d[i+1]+=n;d[i+2]+=n}
   g.putImageData(id,0,0);
   for(let i=0;i<46;i++){ // soft mottling (uneven card tone)
     const x=Math.random()*size,y=Math.random()*size,r=50+Math.random()*120,dark=Math.random()<.55;
-    const gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,dark?'rgba(70,58,40,.07)':'rgba(255,252,240,.10)');gr.addColorStop(1,'rgba(0,0,0,0)');
+    const gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,dark?'rgba(70,58,40,.05)':'rgba(255,252,240,.06)');gr.addColorStop(1,'rgba(0,0,0,0)');
     g.fillStyle=gr;g.fillRect(x-r,y-r,r*2,r*2);
-  }
-  for(let i=0;i<420;i++){ // paper fibres: visible in colour, only a whisper in the (blurred) relief
-    const x=Math.random()*size,y=Math.random()*size,a=Math.random()*6.28,l=10+Math.random()*34,lt=Math.random()<.5;
-    g.strokeStyle=lt?'rgba(255,255,250,.22)':'rgba(70,58,40,.10)';g.lineWidth=.6+Math.random()*.9;
-    g.beginPath();g.moveTo(x,y);g.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l);g.stroke();
-    hg.strokeStyle=lt?'rgba(255,255,255,.10)':'rgba(0,0,0,.10)';hg.lineWidth=1.2;
-    hg.beginPath();hg.moveTo(x,y);hg.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l);hg.stroke();
   }
   const groove=(x,y,w,h)=>{g.fillStyle='rgba(0,0,0,.26)';g.fillRect(x,y,w,h);hg.fillStyle='#383838';hg.fillRect(x,y,w,h)};
   if(kind==='roof'){for(let x=0;x<size;x+=size/16){groove(x,0,4,size);g.fillStyle='rgba(255,255,255,.16)';g.fillRect(x+4,0,2,size)}}
@@ -323,7 +319,7 @@ function pmat(tex,bs){
   return cardify(new THREE.MeshStandardMaterial(o));
 }
 const stoneTex=makeTex('stone'),plainTex=makeTex('plain'),roofTex=makeTex('roof'),cardTex=makeTex('card'),checkTex=makeTex('checker');
-const paper=pmat(stoneTex,.7),paperL=pmat(plainTex,.8),paperT=pmat(plainTex,.6),paperD=pmat(cardTex,.9),roofM=pmat(roofTex,3),checkM=pmat(checkTex,2.5);
+const paper=pmat(stoneTex,0),paperL=pmat(plainTex,0),paperT=pmat(plainTex,0),paperD=pmat(cardTex,0),roofM=pmat(roofTex,3),checkM=pmat(checkTex,2.5);
 const darkM=cardify(new THREE.MeshStandardMaterial({color:0x34332f,roughness:1}));
 const blackM=new THREE.MeshBasicMaterial({color:0x000000});
 
@@ -340,8 +336,8 @@ function blueprintTex(){
     for(let p=0;p<=S;p+=256){g.beginPath();g.moveTo(p,0);g.lineTo(p,S);g.stroke();g.beginPath();g.moveTo(0,p);g.lineTo(S,p);g.stroke()}
     g.fillStyle='rgba(35,35,35,.72)';g.strokeStyle='rgba(35,35,35,.65)';g.lineWidth=2;
     g.font="30px 'Special Elite',Courier,monospace";
-    [['ENTRADA PRINCIPAL',180,1560],['GUARD ROTATION / 22:00',980,1650],['SCALE 1:200',1560,1960],
-     ['ASHRAM — OREGON · 1981',200,1860],['ANDAR SE KOI?',1250,1790],['COURTYARD',90,900],['BIG MUDDY RANCH',1560,760]].forEach(([t,x,y])=>g.fillText(t,x,y));
+    [['MAIN ENTRANCE',180,1560],['GUARD ROTATION / 22:00',980,1650],['SCALE 1:200',1560,1960],
+     ['ASHRAM — OREGON · 1981',200,1860],['AN INSIDE JOB?',1250,1790],['COURTYARD',90,900],['BIG MUDDY RANCH',1560,760]].forEach(([t,x,y])=>g.fillText(t,x,y));
     g.beginPath();g.moveTo(360,1500);g.lineTo(1690,1500);g.stroke();
     [360,1690].forEach(x=>{g.beginPath();g.moveTo(x,1480);g.lineTo(x,1520);g.stroke()});
     g.fillText('26.8',990,1490);
@@ -375,27 +371,62 @@ function posterTex(){ // timeline poster (facts only)
     g.fillText('TIMELINE 1981–1985',44,92);
     g.fillStyle='#b0102a';g.fillRect(44,112,W-88,6);
     g.fillStyle='rgba(30,30,30,.85)';g.font="26px 'Special Elite',Courier,monospace";
-    [['1981','Big Muddy Ranch kharida gaya'],['1982','Rajneeshpuram city incorporate'],['1984','The Dalles — salmonella (751 beemar)'],['1985','Plea aur deport']]
+    [['1981','Big Muddy Ranch purchased'],['1982','Rajneeshpuram incorporated as a city'],['1984','The Dalles — salmonella (751 sickened)'],['1985','Plea and deportation']]
       .forEach(([y,t],i)=>{g.fillStyle='#b0102a';g.fillText(y,44,176+i*66);g.fillStyle='rgba(30,30,30,.85)';g.fillText(t,150,176+i*66);
         g.fillStyle='rgba(30,30,30,.25)';g.fillRect(44,190+i*66,W-88,2)});
     g.strokeStyle='rgba(30,30,30,.6)';g.lineWidth=2;g.strokeRect(700,330,260,140);g.beginPath();g.arc(830,400,46,0,6.28);g.stroke();
   });
 }
+const ARTICLES=[
+ ['SALMONELLA HITS THE DALLES','751 people sickened · 1984','DAILY REPORT'],
+ ['A CITY ON A RANCH','Big Muddy Ranch, Oregon · 1981','DAILY REPORT'],
+ ['MARRIAGES ON PAPER ONLY?','Immigration fraud investigation','COURT RECORD'],
+ ['WIRETAPPING ALLEGED','Bugging at the ashram and hotel','COURT RECORD'],
+ ['PLOT AGAINST US ATTORNEY','The plan was never carried out','DAILY REPORT'],
+ ['IN COURT','Charges against the inner circle','COURT RECORD'],
+ ['1985: DEPORTED','Plea on immigration fraud, $400,000 fine','DAILY REPORT'],
+ ['CITY INCORPORATED','Rajneeshpuram · 1982','CITY RECORD']
+];
 function docTex(n){
-  return inkTex(384,480,(g,W,H)=>{
-    g.fillStyle='#ecebe6';g.fillRect(0,0,W,H);
-    g.strokeStyle='rgba(30,30,30,.6)';g.lineWidth=2;g.strokeRect(14,14,W-28,H-28);
-    g.fillStyle='rgba(30,30,30,.75)';g.fillRect(24,26,90+n*12,12);
-    g.strokeRect(34,70,W-68,150);
-    for(let i=1;i<5;i++){g.beginPath();g.moveTo(34+i*(W-68)/5,70);g.lineTo(34+i*(W-68)/5,220);g.stroke()}
-    g.beginPath();g.arc(W/2,145,34+n*4,0,6.28);g.stroke();
-    g.fillStyle='rgba(40,40,40,.45)';
-    for(let y=250;y<H-30;y+=16)g.fillRect(34,y,110+Math.random()*(W-190),5);
-    g.strokeStyle='#b0102a';g.lineWidth=5;g.beginPath();g.arc(70+Math.random()*(W-140),100+Math.random()*100,26,0,6.28);g.stroke();
-    if(n%2){g.fillStyle='#b0102a';g.fillRect(34,H-56,W-68,7)}
+  return inkTex(512,640,(g,W,H)=>{
+    const [head,sub,mast]=ARTICLES[n%ARTICLES.length];
+    g.fillStyle='#d9d3c0';g.fillRect(0,0,W,H);
+    for(let i=0;i<16;i++){const x=Math.random()*W,y=Math.random()*H,r=60+Math.random()*120,gr=g.createRadialGradient(x,y,0,x,y,r);
+      gr.addColorStop(0,'rgba(120,100,60,.07)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(x-r,y-r,r*2,r*2)}
+    g.strokeStyle='rgba(30,28,24,.75)';g.lineWidth=3;g.strokeRect(14,14,W-28,H-28);
+    g.textBaseline='alphabetic';
+    // masthead
+    g.fillStyle='#1d1b18';g.font="800 20px 'Big Shoulders Display',Impact,sans-serif";g.fillText(mast.split('').join(' '),32,48);
+    g.fillRect(32,58,W-64,3);
+    // headline (wrapped, up to 3 lines)
+    g.font="900 56px 'Big Shoulders Display',Impact,sans-serif";
+    const words=head.split(' '),lines=[];let cur='';
+    words.forEach(w=>{const t=cur?cur+' '+w:w;if(g.measureText(t).width>W-64&&cur){lines.push(cur);cur=w}else cur=t});lines.push(cur);
+    lines.slice(0,3).forEach((ln,i)=>g.fillText(ln,32,116+i*52));
+    const ya=116+(Math.min(lines.length,3)-1)*52;
+    g.fillStyle='#b0102a';g.fillRect(32,ya+14,W-64,5);
+    g.fillStyle='#2a2825';g.font="21px 'Special Elite',Courier,monospace";g.fillText(sub,32,ya+50);
+    // halftone "photo" (building + trees)
+    const py=ya+68,pw=190,ph=132;
+    const pg=g.createLinearGradient(0,py,0,py+ph);pg.addColorStop(0,'#cfc9b6');pg.addColorStop(1,'#8f897a');
+    g.fillStyle=pg;g.fillRect(32,py,pw,ph);
+    g.fillStyle='#3b3833';g.fillRect(58,py+46,pw-52,ph-46-14);
+    g.fillRect(48,py+60,16,ph-74);g.fillRect(pw-8,py+60,16,ph-74);
+    g.fillStyle='#d6d0be';for(let r=0;r<3;r++)for(let c=0;c<6;c++)g.fillRect(70+c*21,py+58+r*20,10,12);
+    g.fillStyle='#4a463f';g.beginPath();g.moveTo(52,py+46);g.lineTo(32+pw/2,py+24);g.lineTo(32+pw-20,py+46);g.fill();
+    g.fillStyle='rgba(0,0,0,.14)';for(let y=0;y<ph;y+=5)for(let x=(y/5%2)*3;x<pw;x+=6){g.beginPath();g.arc(32+x,py+y,1.2,0,6.28);g.fill()}
+    g.strokeStyle='rgba(30,28,24,.8)';g.lineWidth=2;g.strokeRect(32,py,pw,ph);
+    // text columns (with red highlight lines like the reference's marked-up posters)
+    const bars=(x,y,w,rows,hl)=>{for(let r=0;r<rows;r++){
+      const ww=w*(.72+Math.random()*.28);
+      if(hl.includes(r)){g.fillStyle='rgba(176,16,42,.9)';g.fillRect(x,y+r*13,ww,8)}
+      else{g.fillStyle='rgba(40,37,32,.55)';g.fillRect(x,y+r*13,ww,5)}}};
+    bars(32+pw+16,py,W-64-pw-16,10,[3]);
+    bars(32,py+ph+22,(W-76)/2,Math.max(3,Math.floor((H-34-(py+ph+22))/13)),[2]);
+    bars(32+(W-76)/2+12,py+ph+22,(W-76)/2,Math.max(3,Math.floor((H-34-(py+ph+22))/13)),[]);
   });
 }
-const docMats=[0,1,2,3,4,5,6,7].map(i=>new THREE.MeshStandardMaterial({map:docTex(i),roughness:1}));
+const docMats=[0,1,2,3,4,5,6,7].map(()=>new THREE.MeshStandardMaterial({color:0xe4e4e4,roughness:1}));   // maps are set once the fonts are loaded
 const pinGeo=new THREE.SphereGeometry(.04,8,6),pinMat=new THREE.MeshBasicMaterial({color:0x9c0e22});
 const stringMat=new THREE.MeshBasicMaterial({color:0x9c0e22});
 function string(parent,a,b){
@@ -404,13 +435,20 @@ function string(parent,a,b){
   m.position.copy(a).addScaledVector(dv,.5);
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dv.normalize());parent.add(m);
 }
+const tapeMat=new THREE.MeshBasicMaterial({color:0xe6dcb8,transparent:true,opacity:.8,depthWrite:false});
+const docShadowMat=new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.38,depthWrite:false});
 function evidence(parent,px,py,pz,rotY,specs,order){
   const g=new THREE.Group();g.position.set(px,py,pz);g.rotation.y=rotY;parent.add(g);
   const pts=[];
   specs.forEach(([x,y,r,w,h],i)=>{
+    const dz=i*.003;
+    const sh=new THREE.Mesh(new THREE.PlaneGeometry(w*1.03,h*1.03),docShadowMat);
+    sh.position.set(x+.035,y-.04,.008+dz);sh.rotation.z=r;g.add(sh);
     const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),docMats[i%docMats.length]);
-    m.position.set(x,y,.02);m.rotation.z=r;m.receiveShadow=true;g.add(m);
-    const pin=new THREE.Mesh(pinGeo,pinMat);pin.position.set(x,y+h*.42,.06);g.add(pin);pts.push(pin.position.clone());
+    m.position.set(x,y,.02+dz);m.rotation.z=r;m.receiveShadow=true;g.add(m);
+    const tp=new THREE.Mesh(new THREE.PlaneGeometry(.2,.065),tapeMat);
+    tp.position.set(x,y+h*.5-.01,.026+dz);tp.rotation.z=r+(i%2?.12:-.1);g.add(tp);
+    const pin=new THREE.Mesh(pinGeo,pinMat);pin.position.set(x,y+h*.38,.06+dz);g.add(pin);pts.push(pin.position.clone());
   });
   order.reduce((a,b)=>{string(g,pts[a],pts[b]);return b});
 }
@@ -508,13 +546,6 @@ const lan=new THREE.Mesh(new THREE.CylinderGeometry(.18,.22,.4,12),paper);lan.po
 [-3.9,3.9].forEach(cx=>{for(let r=0;r<2;r++)for(let c=0;c<5;c++)win(XB,cx-1.4+c*.7,.55+r*.9,1.31,.32,.55,.06)});
 for(let i=0;i<6;i++)for(let r=0;r<2;r++){const z=-2.3-i*.95,y=.55+r*.9;win(XB,-2.1+.03,y,z,.06,.55,.4);win(XB,2.1-.03,y,z,.06,.55,.4)}
 [-1.3,0,1.3].forEach(x=>{win(XB,x,1.0,-7.69,.7,1.3,.06);win(XB,x,2.95,-7.69,.5,.7,.06)});
-// courtyard skylights: two pyramids each side (bottom corners of the symmetrical shot)
-[-1,1].forEach(sx=>[-3.7,-5.9].forEach(z=>{
-  const gg=new THREE.CylinderGeometry(0,.95,.9,4);gg.rotateY(Math.PI/4);
-  const m=new THREE.Mesh(gg,new THREE.MeshStandardMaterial({color:0x2a2a2a,roughness:.4,emissive:0xbfd8ff,emissiveIntensity:.25}));
-  m.position.set(sx*1.05,.75,z);m.castShadow=true;g2.add(m);
-  const e=new THREE.LineSegments(new THREE.EdgesGeometry(gg),new THREE.LineBasicMaterial({color:0xf2f2f2}));e.position.copy(m.position);g2.add(e);
-}));
 shaft(g2,.6,2.4,-4.5,1.4,6,-.5,.3);shaft(g2,-.8,2.4,-3.0,1.4,6,.45,-.3);shaft(g2,.2,2.4,-6.2,1.4,6,-.4,.2);
 evidence(g2,0,0,-1.5,Math.PI,
   [[-1.55,2.3,-.05,.8,1],[-.5,2.5,.04,.8,1],[.55,2.35,-.03,.8,1],[1.5,2.45,.05,.8,1],[-1.1,1.15,.03,.8,1],[0,1.05,-.04,.8,1],[1.05,1.2,.05,.8,1]],[0,4,5,1,2,6,3]);
@@ -572,7 +603,7 @@ let posterMat;
   [-6.5,-8.5,-10.5].forEach(z=>{const arch=new THREE.Mesh(new THREE.TorusGeometry(6.0,.28,8,40,Math.PI),paperL);arch.position.set(0,2.8,z);arch.castShadow=true;G.add(arch)});
   const rw=new THREE.Mesh(new THREE.TorusGeometry(1.45,.14,10,40),paperL);rw.position.set(0,8.4,-14.85);G.add(rw);
   const disc=new THREE.Mesh(new THREE.CircleGeometry(1.35,40),glassM[0]);disc.position.set(0,8.4,-14.88);G.add(disc);
-  evidence(G,-6.17,.3,-5.5,Math.PI/2,[0,1,2,3,4,5,6,7].map(i=>[-3.3+i*.95,1.2+(i%3)*.5,(i%2?.04:-.05),.8,1.0]),[0,3,6,1,4,7,2,5]);
+  evidence(G,-6.17,.3,-5.5,Math.PI/2,[0,1,2,3,4,5,6,7].map(i=>[-3.3+i*.95,1.25+(i%3)*.45,(i%2?.04:-.05),.88,1.12]),[0,3,6,1,4,7,2,5]);
   posterMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:1});
   const poster=new THREE.Mesh(new THREE.PlaneGeometry(5,2.5),posterMat);poster.position.set(6.17,2.55,-5.8);poster.rotation.y=-Math.PI/2;G.add(poster);
   [[-3.2,-2,.4,.5],[2.8,-4,-.38,.5],[-2.5,-8,.34,.5],[3.4,-9.5,-.42,.5]].forEach(([x,z,rz,ry])=>shaft(G,x,5.4,z,1.8,10,rz,ry));
@@ -711,7 +742,7 @@ function applyTime(t){
   P.x+=Math.sin(t*.9)*.012;P.y+=Math.sin(t*1.3+1)*.01;
   camera.position.copy(P);camera.lookAt(Lk);
   if(s.roll)camera.rotateZ(lerp(s.roll[0],s.roll[1],k));
-  camLight.position.copy(P);camLight.intensity=(s.cl||0);
+  camLight.position.copy(P);camLight.intensity=(s.cl||0)*.55;
   spot.intensity=s.li*LI*(s.ramp?clamp(.15+tin/4.5,.15,1):1);
   const on=clamp((t-.5)/2);
   glassM.forEach((m,i)=>{m.emissiveIntensity=[1.3,.9,1.6][i]*(.92+.08*Math.sin(t*3+i*2))*on});
@@ -805,7 +836,7 @@ function drawLabel(ctx,L,t,W,H){
   }
   ctx.fillStyle=RED;                                // main rule
   ctx.fillRect(ox+(bx-ox)*sc,ruleY,boxW*sc,2*k);
-  ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=u*1.1;
+  ctx.shadowColor='rgba(0,0,0,.95)';ctx.shadowBlur=u*1.6;
   ctx.fillStyle=RED;ctx.font=tagF;spaced(ctx,tag,bx,tagY,tagSp,boxW,side==='l'?'l':side==='r'?'r':'c');
   // scrambled main text
   const p=clamp(tin/.75);let s='';
@@ -835,8 +866,15 @@ function drawTitle(ctx,t,W,H){
   if(a2>0){
     ctx.globalAlpha=a2;ctx.fillStyle='#e6e1d6';
     const px=Math.max(10*k,u*.9);ctx.font=`700 ${px}px 'Big Shoulders Display',sans-serif`;
-    const txt='EK SHEHAR · EK BHAGWAN · EK SAAZISH',w=spacedW(ctx,txt,px*.42);
+    const txt='ONE CITY · ONE GURU · ONE CONSPIRACY',w=spacedW(ctx,txt,px*.42);
     spaced(ctx,txt,(W-w)/2,H*.11+size*.92+14*k,px*.42,0,'l');
+  }
+  const a4=clamp((tin-1.5)/1.2);
+  if(a4>0){
+    ctx.globalAlpha=a4;ctx.fillStyle='#a79f8d';
+    const px=Math.max(10*k,u*.8);ctx.font=`700 ${px}px 'Big Shoulders Display',sans-serif`;
+    const txt='SHIKHAR YADAV · @SHIKHARYADAVDOCS',w=spacedW(ctx,txt,px*.32);
+    spaced(ctx,txt,(W-w)/2,H*.11+size*.92+14*k+Math.max(10*k,u*.9)*1.5+12*k,px*.32,0,'l');
   }
   const a3=clamp((tin-2.4)/1.2);
   if(a3>0){
@@ -905,7 +943,7 @@ async function exportCodecs(){
   const muxer=new Mp4Muxer.Muxer({target,video:{codec:'avc',width:EW,height:EH},audio:{codec:'aac',numberOfChannels:2,sampleRate:48000},fastStart:'in-memory'});
   let encErr=null;
   const venc=new VideoEncoder({output:(c,m)=>muxer.addVideoChunk(c,m),error:e=>{encErr=e}});venc.configure(cfg);
-  setStatus('Audio ban raha hai…',0);
+  setStatus('Building audio…',0);
   const oc=new OfflineAudioContext(2,Math.ceil(48000*DUR),48000);buildAudio(oc,oc.destination);
   const abuf=await oc.startRendering();
   const aenc=new AudioEncoder({output:(c,m)=>muxer.addAudioChunk(c,m),error:e=>{encErr=e}});
@@ -932,7 +970,7 @@ async function exportCodecs(){
 }
 // fallback: real-time recording of the 1080p composite (webm/mp4 depending on browser)
 async function exportRealtime(){
-  setStatus('WebCodecs nahi mila → realtime recording (60 sec). Tab ko foreground mein rakho…',0);
+  setStatus('WebCodecs not available → real-time recording (60 sec). Keep this tab in the foreground…',0);
   const stream=comp.captureStream(EFPS);
   const actx=new (window.AudioContext||window.webkitAudioContext)();
   const dest=actx.createMediaStreamDestination();buildAudio(actx,dest);
@@ -959,7 +997,7 @@ async function exportHD(){
   exporting=true;cancelExport=false;running=false;
   if(ac){try{ac.close()}catch(e){}ac=null}
   document.getElementById('start').style.display='none';replayBox.style.display='none';
-  exUI.style.display='grid';setStatus('Taiyari…',0);
+  exUI.style.display='grid';setStatus('Getting ready…',0);
   const prevPR=renderer.getPixelRatio();
   try{
     await fontWaitP;
@@ -971,9 +1009,9 @@ async function exportHD(){
       try{await exportCodecs();done=true}catch(e){if(String(e&&e.message)==='cancelled')throw e;console.warn('WebCodecs path failed:',e)}
     }
     if(!done)await exportRealtime();
-    setStatus('Ho gaya! Video download ho raha hai (rajneeshpuram-intro-1080p).',1);
+    setStatus('Done! Your video is downloading (rajneeshpuram-intro-1080p).',1);
   }catch(e){
-    setStatus(String(e&&e.message)==='cancelled'?'Cancel kar diya.':'Render fail ho gaya: '+(e&&e.message||e)+'\nDesktop Chrome try karo.',0);
+    setStatus(String(e&&e.message)==='cancelled'?'Cancelled.':'Render failed: '+(e&&e.message||e)+'\nTry desktop Chrome.',0);
   }
   renderer.setPixelRatio(prevPR);exporting=false;resize();
   setTimeout(()=>{exUI.style.display='none';document.getElementById('start').style.display='grid'},3500);
@@ -989,6 +1027,7 @@ fontWaitP.then(()=>{
   sheetMat.map=blueprintTex();sheetMat.needsUpdate=true;
   if(posterMat){posterMat.map=posterTex();posterMat.needsUpdate=true}
   if(gearMat){gearMat.map=gearTex();gearMat.needsUpdate=true}
+  docMats.forEach((m,i)=>{m.map=docTex(i);m.needsUpdate=true});
 });
 requestAnimationFrame(previewFrame);
 document.getElementById('go').addEventListener('click',()=>{document.getElementById('start').style.display='none';fontWaitP.then(runPreview)});
